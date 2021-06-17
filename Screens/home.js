@@ -108,9 +108,10 @@ function getTime(uid,Step1){
   today = dd + '-' + mm + '-' + yyyy;
   String(today);
   console.log(today);
-  firebase.firestore().collection('User').doc(uid).collection('Step').doc(today).update({
+  firebase.firestore().collection('User').doc(uid).collection('Step').doc(today).set({
     Step: Step1,
-    dayOfWeek: n
+    dayOfWeek: n,
+    day: today
   })
 
   //set stepOfday
