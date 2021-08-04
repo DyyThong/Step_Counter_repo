@@ -7,7 +7,14 @@ const HomeStack = createStackNavigator();
 function HistoryStack(){
     const db = firebase.firestore();
     const user = firebase.auth().currentUser;
-    var [data1, setData] = React.useState([]);
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    var time = today.toLocaleTimeString();
+
+    today = dd + '-' + mm + '-' + yyyy;
+    String(today);
     // db.collection("User").doc(user.uid).collection("Step").onSnapshot((snap) =>{
     //     const datas = [];
     //     snap.forEach( 
@@ -28,14 +35,43 @@ function HistoryStack(){
     //         )
     //     })
     //  })
+    var [data1, setData] = React.useState([]);
+    db.collection("User").doc(user.uid).collection("Step").doc("16-06-2021").collection("Log").get().then((snap) =>{
+        const datas = [];
+        snap.forEach((doc) =>{
+            datas.push({
+                message: doc.data().Message,
+                step: doc.data().Step,
+                time: doc.data().Time,
+            })
+        })
+        setData(datas);
+    
+     })
+
     return(
-        <View>
+        <View style={styles.container}>
             <ScrollView>
                 {
+
                     data1.map((item, index) => (
-                     <View key = {item.time} style = {styles.item}>
-                        <Text>{item.message + " " + item.time + " with "+String(item.step) +" steps"}</Text>
-                     </View>
+                    <View key = {item.time} style = {styles.item}>
+                        <View style={{ justifyContent: 'space-between',flex:1,flexDirection:'row',}}>
+                            <View style={styles.top}>
+                                <Text>{"Message: " + item.message}</Text>
+                            </View> 
+
+                            <View style={styles.middle}>
+                                <Text>{"Time: " + item.time}</Text>
+                            </View>
+
+                            <View style={styles.bottom}>
+                                <Text>{"Step: " + String(item.step)}</Text>    
+                            </View>   
+                        </View>
+
+                        
+                    </View>
                   ))
                }
             </ScrollView>
@@ -66,27 +102,44 @@ export default function HistoryScreen({navigation}) {
 const styles = StyleSheet.create({
     container:{
         flex: 1, 
-        alignItems: 'center', 
-        justifyContent: 'center'
+        justifyContent: "space-between",
+        backgroundColor: "#fff",
+        padding: 5,
+        margin: 2
     },
-    imageBackground: {
-		flex: 1,
-		resizeMode: "cover",
-		justifyContent: "center"
-	  },
-    item: {
-    alignItems:'center',
-    backgroundColor:'white',
-    justifyContent:'space-between',
-    margin:5,
-    borderRadius: 10,
-    shadowColor: "black",
-    padding:25,
-    shadowOffset: {
-    width: -5,
-    height: 6,
+    top: {
+        flex: 1,
+        backgroundColor: 'powderblue',
+        borderWidth: 2,
+        justifyContent: 'space-around',
+        marginBottom:5,
     },
-    shadowOpacity: 0.23,
-    elevation: 4,
+    middle: {
+        flex: 1.5,
+        backgroundColor: 'skyblue',
+        borderWidth: 2,
+        justifyContent: 'space-between',
+        marginLeft: 2,
+        marginBottom:5,
     },
+    bottom: {
+        flex: 1,
+        backgroundColor: 'steelblue',
+        borderWidth: 2,
+        justifyContent: 'space-between',
+        marginLeft: 2,
+        marginBottom:5,
+    },
+    // imageBackground: {
+	// 	flex: 1,
+	// 	resizeMode: "cover",
+	// 	justifyContent: "center"
+	//   },
+    // item: {
+    // alignItems:'center',
+    // backgroundColor:'white',
+    // justifyContent:'space-between',
+    // shadowColor: "black",
+    // padding:5,
+    // },
 })
